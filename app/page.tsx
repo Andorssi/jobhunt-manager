@@ -80,21 +80,38 @@ export default function Home() {
     memo: "",
   });
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-      setIsAuthLoading(false);
-      if (data.user) fetchApplications(data.user.id);
-    });
+useEffect(() => {
+  async function initAuth() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) fetchApplications(session.user.id);
-      else setApplications([]);
-    });
+    setUser(session?.user ?? null);
+    setIsAuthLoading(false);
 
-    return () => listener.subscription.unsubscribe();
-  }, []);
+    if (session?.user) {
+      fetchApplications(session.user.id);
+    }
+  }
+
+  initAuth();
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null);
+
+    if (session?.user) {
+      fetchApplications(session.user.id);
+    } else {
+      setApplications([]);
+    }
+  });
+
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []);
 
   async function fetchApplications(userId: string) {
     const { data, error } = await supabase
