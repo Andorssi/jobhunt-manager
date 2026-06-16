@@ -129,12 +129,23 @@ useEffect(() => {
   setApplications((data ?? []).map(toApp));
 }
 
-  async function signInWithGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin },
-    });
-  }
+async function signInWithGoogle() {
+  const redirectUrl =
+    window.location.hostname === "localhost"
+      ? "http://localhost:3000"
+      : "https://jobhunt.yut4k.com";
+
+  await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: redirectUrl,
+      queryParams: {
+        access_type: "offline",
+        prompt: "consent",
+      },
+    },
+  });
+}
 
   async function signOut() {
     await supabase.auth.signOut();
