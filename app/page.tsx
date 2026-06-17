@@ -80,38 +80,55 @@ export default function Home() {
     memo: "",
   });
 
-  useEffect(() => {
-    async function initAuth() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+useEffect(() => {
+  async function initAuth() {
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get("code");
 
-      setUser(session?.user ?? null);
-      setIsAuthLoading(false);
-
-      if (session?.user) {
-        fetchApplications(session.user.id);
+    if (code) {
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        console.error("exchangeCodeForSession error:", error);
       }
+
+      window.history.replaceState(null, "", window.location.pathname);
     }
 
-    initAuth();
-
     const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
 
-      if (session?.user) {
-        fetchApplications(session.user.id);
-      } else {
-        setApplications([]);
-      }
-    });
+    if (error) {
+      console.error("getSession error:", error);
+    }
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+    setUser(session?.user ?? null);
+    setIsAuthLoading(false);
+
+    if (session?.user) {
+      fetchApplications(session.user.id);
+    }
+  }
+
+  initAuth();
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null);
+
+    if (session?.user) {
+      fetchApplications(session.user.id);
+    } else {
+      setApplications([]);
+    }
+  });
+
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []);
 
   async function fetchApplications(userId: string) {
     const { data, error } = await supabase
