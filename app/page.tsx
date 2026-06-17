@@ -129,19 +129,19 @@ export default function Home() {
     setApplications((data ?? []).map(toApp));
   }
 
-  async function signInWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: "https://jobhunt.yut4k.com",
-      },
-    });
+async function signInWithGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  });
 
-    if (error) {
-      console.error(error);
-      window.alert("ログインに失敗しました。");
-    }
+  if (error) {
+    console.error(error);
+    window.alert("ログインに失敗しました。");
   }
+}
 
   async function signOut() {
     await supabase.auth.signOut();
