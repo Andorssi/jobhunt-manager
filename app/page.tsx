@@ -63,6 +63,32 @@ function toApp(item: any): Application {
   };
 }
 
+// 旧バージョン（localStorageベースのSupabaseクライアント）が残した
+// 認証データを一度だけ削除する。createBrowserClient（クッキーベース）に
+// 移行した後も古いlocalStorageの値が残っていると、ログイン状態の判定が
+// 不安定になり、ログイン画面へのループが発生することがあるための対策。
+function clearLegacySupabaseStorage() {
+  const flagKey = "sb-legacy-storage-cleared-v1";
+
+  try {
+    if (localStorage.getItem(flagKey)) return;
+
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("sb-")) {
+        keysToRemove.push(key);
+      }
+    }
+
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+    localStorage.setItem(flagKey, "1");
+  } catch (e) {
+    // localStorageが使用できない環境（プライベートモード等）では何もしない
+    console.warn("clearLegacySupabaseStorage skipped:", e);
+  }
+}
+
 export default function Home() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -82,6 +108,8 @@ export default function Home() {
 
 useEffect(() => {
   async function initAuth() {
+    clearLegacySupabaseStorage();
+
     const {
       data: { session },
       error,
