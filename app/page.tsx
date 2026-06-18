@@ -82,18 +82,6 @@ export default function Home() {
 
 useEffect(() => {
   async function initAuth() {
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get("code");
-
-    if (code) {
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
-      if (error) {
-        console.error("exchangeCodeForSession error:", error);
-      }
-
-      window.history.replaceState(null, "", window.location.pathname);
-    }
-
     const {
       data: { session },
       error,
