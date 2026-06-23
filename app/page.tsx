@@ -48,6 +48,17 @@ function getNearestDeadline(app: Application) {
   return Math.min(...dates);
 }
 
+function isSafeUrl(url: string) {
+  if (!url) return true;
+
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 function toApp(item: any): Application {
   return {
     id: item.id,
@@ -217,6 +228,10 @@ async function signInWithGoogle() {
   async function addApplication() {
     if (!form.companyName.trim()) return;
     if (!user) return;
+    if (!isSafeUrl(form.url)) {
+      window.alert("URLは http:// または https:// から始まる形式で入力してください。");
+      return;
+    }
 
     const { data, error } = await supabase
       .from("applications")
@@ -277,6 +292,10 @@ async function signInWithGoogle() {
     key: keyof Omit<Application, "id">,
     value: string
   ) {
+    if (key === "url" && !isSafeUrl(value)) {
+      window.alert("URLは http:// または https:// から始まる形式で入力してください。");
+      return;
+    }
     setApplications(
       applications.map((app) =>
         app.id === id ? { ...app, [key]: value } : app
