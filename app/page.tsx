@@ -383,11 +383,11 @@ async function signInWithGoogle() {
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-medium">企業名 <span className="text-red-500">*</span></label>
-              <input className="w-full rounded border p-2" placeholder="例: NTT東日本" value={form.companyName} onChange={(e) => setForm({ ...form, companyName: e.target.value })} />
+              <input className="w-full rounded border p-2" maxLength={50} placeholder="例: Kamamu-Lab" value={form.companyName} onChange={(e) => setForm({ ...form, companyName: e.target.value })} />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">マイページID</label>
-              <input className="w-full rounded border p-2" placeholder="例: AB123456" value={form.mypageId} onChange={(e) => setForm({ ...form, mypageId: e.target.value })} />
+              <input className="w-full rounded border p-2" maxLength={50} placeholder="例: AB123456" value={form.mypageId} onChange={(e) => setForm({ ...form, mypageId: e.target.value })} />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">ES締切日</label>
@@ -411,11 +411,11 @@ async function signInWithGoogle() {
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium">マイページURL</label>
-              <input className="w-full rounded border p-2" placeholder="https://..." value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
+              <input className="w-full rounded border p-2" maxLength={100} placeholder="https://..." value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
             </div>
             <div className="md:col-span-2">
               <label className="mb-1 block text-sm font-medium">メモ</label>
-              <textarea className="w-full rounded border p-2" placeholder="例: 適性検査AはTAL、適性検査Bは玉手箱" value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} />
+              <textarea className="w-full rounded border p-2" maxLength={400} placeholder="400字まで" value={form.memo} onChange={(e) => setForm({ ...form, memo: e.target.value })} />
             </div>
           </div>
 
